@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const adminController_1 = require("../controllers/adminController");
+const router = (0, express_1.Router)();
+router.use(authMiddleware_1.authenticate, authMiddleware_1.requireAdmin);
+router.get("/dashboard", adminController_1.getAdminDashboard);
+router.post("/trip", adminController_1.createTrip);
+router.put("/trip/:id", adminController_1.editTrip);
+router.delete("/trip/:id", adminController_1.deleteTrip);
+router.post("/trip/:id/traveler", adminController_1.addTraveler);
+router.post("/trip/:id/staff", adminController_1.assignStaff);
+router.post("/trip/:id/notification", adminController_1.sendNotification);
+exports.default = router;

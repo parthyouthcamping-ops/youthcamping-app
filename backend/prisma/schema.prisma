@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  TRAVELER
+  GUIDE
+  DRIVER
+}
+
+enum PaymentStatus {
+  PENDING
+  BOOKED
+  PARTIAL
+  PAID
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  phone         String?
+  passwordHash  String
+  role          UserRole       @default(TRAVELER)
+  createdAt     DateTime       @default(now())
+  tripTravelers TripTraveler[]
+  tripStaff     TripStaff[]
+  coordinatorTravelers TripTraveler[] @relation("CoordinatorTravelers")
+}
+
+model Trip {
+  id             String          @id @default(uuid())
+  title          String
+  destination    String
+  departureDate  DateTime
+  returnDate     DateTime
+  departureCity  String
+  departurePoint String
+  departureTime  String
+  vehicleNumber  String
+  vehicleType    String
+  groupSize      Int
+  maxAltitude    Int
+  difficulty     String
+  status         String          @default("planning")
+  price          Float?
+  createdAt      DateTime @default(now())
+  travelers      TripTraveler[]
+  staff          TripStaff[]
+  itinerary      ItineraryItem[]
+  packingItems   PackingItem[]
+  notifications  Notification[]
+}
+
+model TripTraveler {
+  id                String   @id @default(uuid())
+  trip              Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  
+  // Participant System Replacement
+  participant_code  String   @unique
+  booking_reference String?
+  checkin_status    String   @default("REGISTERED") // REGISTERED, CHECKED_IN, ON_TRIP, COMPLETED
+  registration_date DateTime @default(now())
+  
+  // Payment Fields
+  booking_amount    Float    @default(0)
+  total_amount      Float    @default(0)
+  amount_paid       Float    @default(0)
+  remaining_amount  Float    @default(0)
+  payment_status    String   @default("PENDING") // PENDING, BOOKED, PARTIAL, PAID, REFUNDED
+  payment_method    String?
+  payment_date      DateTime?
+  transaction_id    String?
+  payment_updated_at DateTime? @updatedAt
+  
+  // Coordinator Relation
+  coordinator       User?    @relation("CoordinatorTravelers", fields: [coordinator_id], references: [id])
+  coordinator_id    String?
+
+  // Gateway Support
+  gateway           String?
+  payment_reference String?
+  payment_verified  Boolean  @default(false)
+
+  paymentRecords    PaymentRecord[]
+}
+
+model PaymentRecord {
+  id               String       @id @default(uuid())
+  tripTraveler     TripTraveler @relation(fields: [tripTravelerId], references: [id], onDelete: Cascade)
+  tripTravelerId   String
+  amount           Float
+  payment_method   String
+  payment_date     DateTime     @default(now())
+  transaction_id   String?
+  payment_type     String       @default("PARTIAL") // BOOKING, PARTIAL, FULL
+  gateway          String?
+  payment_reference String?
+  payment_verified Boolean      @default(false)
+}
+
+model TripStaff {
+  id     String @id @default(uuid())
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  role   String
+}
+
+model ItineraryItem {
+  id          String   @id @default(uuid())
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId      String
+  dayNumber   Int
+  date        String
+  title       String
+  activities  String   // JSON stringified array or plain text
+}
+
+model PackingItem {
+  id        String @id @default(uuid())
+  trip      Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
+  category  String
+  itemName  String
+  provided  Boolean @default(false)
+  mandatory Boolean @default(true)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
+  title     String
+  message   String
+  sentBy    String
+  createdAt DateTime @default(now())
+}

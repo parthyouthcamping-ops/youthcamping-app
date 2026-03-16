@@ -1,0 +1,27 @@
+﻿src/controllers/admin.controller.ts(36,55): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(43,42): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(125,17): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(134,50): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(262,35): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"TripTraveler"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"TripTraveler"> | undefined'.
+src/controllers/traveler.controller.ts(22,58): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/traveler.controller.ts(31,70): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"ItineraryItem"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"ItineraryItem"> | undefined'.
+src/controllers/traveler.controller.ts(39,66): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"PackingItem"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"PackingItem"> | undefined'.
+src/controllers/traveler.controller.ts(48,17): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"TripStaff"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"TripStaff"> | undefined'.
+src/controllers/traveler.controller.ts(59,17): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"Notification"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"Notification"> | undefined'.
+src/controllers/traveler.controller.ts(69,24): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/traveler.controller.ts(81,22): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"TripTraveler"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"TripTraveler"> | undefined'.
+src/controllers/traveler.controller.ts(95,22): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+

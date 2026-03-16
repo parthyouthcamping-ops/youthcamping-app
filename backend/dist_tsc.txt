@@ -1,0 +1,3 @@
+error TS6059: File 'C:/Users/Dell/Documents/Web Application/backend/prisma/seed.ts' is not under 'rootDir' 'C:/Users/Dell/Documents/Web Application/backend/src'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Matched by default include pattern '**/*'
