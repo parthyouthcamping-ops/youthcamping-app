@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Map, MapPin, Calendar, Compass, ArrowRight, BellRing } from "lucide-react";
 import SOSButton from "@/components/traveler/SOSButton";
 import AIAssistant from "@/components/traveler/AIAssistant";
+import { apiFetch } from "@/lib/api";
 
 export default function Dashboard() {
   const [trips, setTrips] = useState<any[]>([]);
@@ -13,92 +14,100 @@ export default function Dashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const headers = { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` };
-      
-      const userRes = await fetch("/api/auth/me", { headers });
-      if(userRes.ok) setUser(await userRes.json());
-      else window.location.href = "/login"; // Force boot
+      try {
+        const userRes = await apiFetch("/api/auth/me");
+        if(userRes.ok) {
+          setUser(await userRes.json());
+        } else {
+          window.location.href = "/login";
+          return;
+        }
 
-      const tripsRes = await fetch("/api/traveler/trips", { headers });
-      if(tripsRes.ok) setTrips(await tripsRes.json());
+        const tripsRes = await apiFetch("/api/traveler/trips");
+        if(tripsRes.ok) setTrips(await tripsRes.json());
+      } catch (err) {
+        console.error("Failed to load dashboard data", err);
+      }
     };
     load();
   }, []);
 
-  if(!user) return <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center text-gray-500">Loading your profile...</div>;
+  if(!user) return <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center text-gray font-body italic">Syncing your profile...</div>;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-montserrat pb-24">
        {/* Greeting Header */}
-       <div className="bg-[#0f2d54] text-white pt-12 pb-20 px-6 rounded-b-[3rem] relative overflow-hidden">
-          <Compass className="absolute right-[-40px] top-[-20px] w-64 h-64 text-white opacity-5" />
+       <div className="bg-navy text-white pt-16 pb-24 px-6 rounded-b-[4rem] relative overflow-hidden">
+          <Compass className="absolute right-[-60px] top-[-30px] w-80 h-80 text-white opacity-5 rotate-12" />
           <div className="max-w-4xl mx-auto relative z-10">
-             <h1 className="text-4xl font-black mb-2">Hello, {user.name.split(" ")[0]}!</h1>
-             <p className="text-blue-200 text-lg">Your next adventure awaits.</p>
+             <h1 className="text-5xl font-black mb-3 font-heading uppercase tracking-tight">Hello, {user.name.split(" ")[0]}!</h1>
+             <p className="text-secondary opacity-80 text-xl font-body">Your next adventure awaits.</p>
           </div>
        </div>
 
-       <div className="max-w-4xl mx-auto px-4 -mt-10 space-y-6">
-          <div className="flex justify-between items-end mb-4 px-2">
-             <h2 className="text-xl font-black tracking-wider uppercase">My Expeditions</h2>
-             <span className="text-xs font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">{trips.length} Active</span>
+       <div className="max-w-4xl mx-auto px-4 -mt-12 space-y-8">
+          <div className="flex justify-between items-end mb-4 px-4">
+             <h2 className="text-xs font-black tracking-[0.2em] uppercase text-navy font-heading">My Expeditions</h2>
+             <span className="text-[10px] font-black text-white bg-primary px-3 py-1 rounded-full uppercase tracking-widest font-heading shadow-lg shadow-primary/20">{trips.length} Active</span>
           </div>
 
           {trips.length === 0 ? (
-             <div className="bg-white rounded-3xl p-10 text-center shadow-md border border-gray-100">
-                <Map className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-800">No active trips yet.</h3>
-                <p className="text-gray-500 mt-2">Book your next journey with our office and it will appear here instantly.</p>
+             <div className="bg-white rounded-3xl p-16 text-center shadow-sm border border-gray-100 font-body">
+                <Map className="w-16 h-16 text-gray/20 mx-auto mb-6" />
+                <h3 className="text-2xl font-black text-navy font-heading">No active trips yet.</h3>
+                <p className="text-gray mt-3 max-w-sm mx-auto">Book your next journey with our office and it will appear here instantly.</p>
              </div>
           ) : trips.map(t => (
-             <Link key={t.id} href={`/trip/${t.id}`} className="block group">
-                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 relative">
-                   <div className="absolute top-4 right-4 bg-[#f97316] text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-lg z-10">
+             <Link key={t.id} href={`/trip/${t.id}`} className="block group font-body">
+                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 relative">
+                   <div className="absolute top-6 right-6 bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg z-10 font-heading">
                       View Portal
                    </div>
                    
-                   <div className="p-6">
-                      <div className="flex items-center gap-2 text-[#2d6a4f] text-sm font-bold uppercase tracking-wider mb-2">
-                         <span className="w-2 h-2 bg-[#2d6a4f] rounded-full animate-pulse"></span>
+                   <div className="p-8">
+                      <div className="flex items-center gap-3 text-teal text-[10px] font-black uppercase tracking-widest mb-4 font-heading">
+                         <span className="w-2 h-2 bg-teal rounded-full animate-pulse shadow-[0_0_8px_rgba(13,115,119,0.5)]"></span>
                          {t.status}
                       </div>
 
-                      <h3 className="text-3xl font-black text-[#0f2d54] mb-2">{t.title}</h3>
-                      <p className="flex items-center gap-1 text-gray-500 font-medium mb-6">
-                         <MapPin className="w-4 h-4" /> {t.destination}
+                      <h3 className="text-3xl font-black text-navy mb-3 font-heading tracking-tight uppercase group-hover:text-primary transition-colors">{t.title}</h3>
+                      <p className="flex items-center gap-2 text-gray font-bold mb-8">
+                         <MapPin className="w-4 h-4 text-primary" /> {t.destination}
                       </p>
 
-                      <div className="grid grid-cols-2 gap-4">
-                         <div className="bg-gray-50 p-4 rounded-2xl flex items-center gap-3">
-                            <div className="bg-blue-100 p-2 rounded-xl text-blue-600"><Calendar className="w-5 h-5" /></div>
+                      <div className="grid grid-cols-2 gap-6">
+                         <div className="bg-gray-50 p-5 rounded-2xl flex items-center gap-4 border border-gray-100">
+                            <div className="bg-navy/5 p-3 rounded-xl text-navy transition-transform group-hover:scale-110"><Calendar className="w-6 h-6" /></div>
                             <div>
-                               <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Departure</p>
-                               <p className="font-bold text-gray-800">{format(new Date(t.departureDate), "MMM dd")}</p>
+                               <p className="text-[10px] text-gray font-black tracking-widest uppercase mb-1 font-heading">Departure</p>
+                               <p className="font-bold text-navy">{format(new Date(t.departureDate), "MMM dd")}</p>
                             </div>
                          </div>
-                         <div className="bg-gray-50 p-4 rounded-2xl flex items-center gap-3">
-                            <div className="bg-orange-100 p-2 rounded-xl text-[#f97316]"><Compass className="w-5 h-5" /></div>
+                         <div className="bg-gray-50 p-5 rounded-2xl flex items-center gap-4 border border-gray-100">
+                            <div className="bg-primary/5 p-3 rounded-xl text-primary transition-transform group-hover:scale-110"><Compass className="w-6 h-6" /></div>
                             <div>
-                               <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Seat</p>
-                               <p className="font-bold text-gray-800">{t.seatNumber || "TBD"}</p>
+                               <p className="text-[10px] text-gray font-black tracking-widest uppercase mb-1 font-heading">Seat</p>
+                               <p className="font-bold text-navy">{t.seatNumber || "TBD"}</p>
                             </div>
                          </div>
                       </div>
                    </div>
-                   <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 flex justify-between items-center group-hover:from-blue-50 group-hover:to-blue-100 transition-colors">
-                      <span className="text-xs font-bold text-gray-500 group-hover:text-[#0f2d54]">PAYMENT: <span className={`uppercase ${t.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-600'}`}>{t.paymentStatus}</span></span>
-                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#f97316] group-hover:translate-x-1 transition-all" />
+                   <div className="bg-gray-50/50 px-8 py-5 flex justify-between items-center group-hover:bg-primary/5 transition-colors border-t border-gray-50">
+                      <span className="text-[10px] font-black text-gray/40 uppercase tracking-[0.2em] font-heading group-hover:text-navy transition-colors">Digital Trip Coordinator • Active Expedition</span>
+                      <ArrowRight className="w-5 h-5 text-gray/40 group-hover:text-primary group-hover:translate-x-2 transition-all" />
                    </div>
                 </div>
              </Link>
           ))}
           
-          <div className="bg-orange-50 border border-orange-200 rounded-3xl p-6 flex gap-4 mt-8">
-             <BellRing className="w-6 h-6 text-orange-600 shrink-0 mt-1" />
+          <div className="bg-primary/5 border border-primary/10 rounded-[2rem] p-8 flex gap-6 mt-12 font-body shadow-sm">
+             <div className="bg-primary/10 p-4 rounded-2xl h-fit">
+                <BellRing className="w-6 h-6 text-primary shrink-0" />
+             </div>
              <div>
-                <h4 className="font-bold text-[#f97316] uppercase tracking-wider text-sm mb-1">System Notice</h4>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                   Make sure to complete your packing checklist at least 2 days before departure. For emergency issues, use the SOS button.
+                <h4 className="font-black text-navy uppercase tracking-widest text-[10px] mb-2 font-heading">System Notice</h4>
+                <p className="text-sm text-gray font-medium leading-[1.6]">
+                   Make sure to complete your packing checklist at least 2 days before departure. For emergency issues, use the SOS button below.
                 </p>
              </div>
           </div>

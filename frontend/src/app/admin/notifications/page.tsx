@@ -16,16 +16,19 @@ export default function AdminNotifications() {
   }, []);
 
   const loadData = async () => {
-    const headers = { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` };
-    const [notifRes, tripRes] = await Promise.all([
-       fetch("/api/admin/notifications", { headers }),
-       fetch("/api/admin/trips", { headers })
-    ]);
-    if(notifRes.ok) setNotifications(await notifRes.json());
-    if(tripRes.ok) {
-       const tData = await tripRes.json();
-       setTrips(tData);
-       if(tData.length > 0) setForm(prev => ({ ...prev, tripId: tData[0].id }));
+    try {
+      const [notifRes, tripRes] = await Promise.all([
+         fetch("/api/admin/notifications", { credentials: "include" }),
+         fetch("/api/admin/trips", { credentials: "include" })
+      ]);
+      if(notifRes.ok) setNotifications(await notifRes.json());
+      if(tripRes.ok) {
+         const tData = await tripRes.json();
+         setTrips(tData);
+         if(tData.length > 0) setForm(prev => ({ ...prev, tripId: tData[0].id }));
+      }
+    } catch (error) {
+      console.error("Failed to load notifications data", error);
     }
   };
 
@@ -34,10 +37,8 @@ export default function AdminNotifications() {
      setLoading(true);
      await fetch("/api/admin/notify", {
         method: "POST",
-        headers: {
-           "Content-Type": "application/json",
-           "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}`
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(form)
      });
      setForm({ ...form, title: "", message: "" });
@@ -46,27 +47,40 @@ export default function AdminNotifications() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <h1 className="text-3xl font-black text-[#0f2d54] mb-2">Broadcast Notification</h1>
-          <p className="text-[#64748b] mb-6">Send important updates instantly to a specific trip group.</p>
-          
-          <form onSubmit={submit} className="space-y-4 max-w-xl">
-             <select 
-               className="w-full border rounded-xl p-3 bg-gray-50 focus:bg-white text-sm font-semibold"
-               value={form.tripId} onChange={e => setForm({...form, tripId: e.target.value})}
-               required
-             >
-                <option value="" disabled>Select Trip</option>
-                {trips.map(t => <option key={t.id} value={t.id}>{t.title} ({format(new Date(t.departureDate), "MMM dd")})</option>)}
-             </select>
-             <input required placeholder="Alert Title (e.g., Weather Warning)" className="w-full border rounded-xl p-3 bg-gray-50 focus:bg-white text-sm font-semibold" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-             <textarea required placeholder="Message details..." rows={4} className="w-full border rounded-xl p-3 bg-gray-50 focus:bg-white text-sm font-semibold resize-none" value={form.message} onChange={e => setForm({...form, message: e.target.value})} />
-             <Button disabled={loading} className="w-full bg-[#f97316] hover:bg-[#ea580c] text-white py-6 rounded-xl text-lg font-bold">
-                {loading ? "Sending..." : "Dispatch Broadcast"}
-             </Button>
-          </form>
-       </div>
+    <div className="max-w-6xl mx-auto space-y-12 pb-20 font-body">
+        <div className="bg-white p-8 sm:p-12 rounded-[3rem] shadow-sm border border-gray-100 relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-[8rem] -z-0"></div>
+           <h1 className="text-4xl font-black text-navy mb-3 font-heading uppercase tracking-tight relative z-10">Broadcast Alerts</h1>
+           <p className="text-gray mb-10 font-medium relative z-10">Send real-time updates to all travelers on a specific expedition.</p>
+           
+           <form onSubmit={submit} className="space-y-6 max-w-2xl relative z-10">
+              <div className="space-y-2">
+                 <label className="text-[10px] font-black text-navy uppercase tracking-widest ml-1 font-heading">Select Target Expedition</label>
+                 <select 
+                   className="w-full border-2 border-gray-50 rounded-2xl p-4 bg-gray-50 focus:bg-white focus:border-primary/20 transition-all text-sm font-bold text-navy outline-none"
+                   value={form.tripId} onChange={e => setForm({...form, tripId: e.target.value})}
+                   required
+                 >
+                    <option value="" disabled>Choose an active trip...</option>
+                    {trips.map(t => <option key={t.id} value={t.id}>{t.destination} ({format(new Date(t.departureDate), "MMM dd, yyyy")})</option>)}
+                 </select>
+              </div>
+              
+              <div className="space-y-2">
+                 <label className="text-[10px] font-black text-navy uppercase tracking-widest ml-1 font-heading">Alert Title</label>
+                 <input required placeholder="e.g. Weather Advisory / Assembly Points" className="w-full border-2 border-gray-50 rounded-2xl p-4 bg-gray-50 focus:bg-white focus:border-primary/20 transition-all text-sm font-bold text-navy outline-none" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+              </div>
+ 
+              <div className="space-y-2">
+                 <label className="text-[10px] font-black text-navy uppercase tracking-widest ml-1 font-heading">Message Content</label>
+                 <textarea required placeholder="Write your announcement here..." rows={4} className="w-full border-2 border-gray-50 rounded-2xl p-4 bg-gray-50 focus:bg-white focus:border-primary/20 transition-all text-sm font-bold text-navy outline-none resize-none" value={form.message} onChange={e => setForm({...form, message: e.target.value})} />
+              </div>
+ 
+              <Button disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
+                 {loading ? "Transmitting..." : "Send Real-Time Alert"}
+              </Button>
+           </form>
+        </div>
 
        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 bg-gray-50/50">

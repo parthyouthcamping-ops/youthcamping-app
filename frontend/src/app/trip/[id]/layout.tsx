@@ -20,29 +20,29 @@ export default function TripLayout({ children, params }: { children: ReactNode, 
   ];
 
   return (
-    <div className="min-h-screen pb-24 bg-[#f8fafc] text-[#0f172a] font-montserrat">
+    <div className="min-h-screen pb-24 bg-[#f8fafc] text-navy font-montserrat">
       {/* Sticky Top Navbar */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between px-4 py-3">
-           <Link href="/dashboard" className="text-[#0f2d54] hover:bg-gray-100 p-2 rounded-full transition-colors">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 py-3 max-w-4xl mx-auto">
+           <Link href="/dashboard" className="text-navy hover:bg-gray-100 p-2 rounded-full transition-colors">
               <ArrowLeft className="w-6 h-6" />
            </Link>
-           <div className="flex items-center gap-2 px-3 py-1 bg-[#0f2d54]/10 text-[#0f2d54] rounded-full font-semibold text-sm">
-             <Map className="w-4 h-4" /> Trip details
+           <div className="flex items-center gap-2 px-4 py-1.5 bg-navy/10 text-navy rounded-full font-bold text-xs uppercase tracking-widest font-heading">
+             <Map className="w-3.5 h-3.5" /> Trip Details
            </div>
            <div className="w-10"></div>{/* Spacer for centering */}
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex overflow-x-auto hide-scrollbar border-t border-gray-100 px-2 lg:justify-center">
+        <div className="flex overflow-x-auto hide-scrollbar border-t border-gray-50 px-2 lg:justify-center max-w-4xl mx-auto">
             {tabs.map((tab) => {
                const isActive = pathname === tab.path;
                return (
                  <Link 
                    key={tab.name}
                    href={tab.path}
-                   className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
-                     isActive ? "border-[#f97316] text-[#0f2d54] font-bold" : "border-transparent text-[#64748b] hover:text-[#0f2d54]"
+                   className={`px-5 py-3.5 text-xs font-black uppercase tracking-widest border-b-2 transition-all duration-200 ${
+                     isActive ? "border-primary text-navy" : "border-transparent text-gray hover:text-navy"
                    }`}
                  >
                    {tab.name}

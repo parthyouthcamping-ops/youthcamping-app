@@ -5,23 +5,30 @@
   --color-foreground: var(--foreground);
   
   /* Brand Colors */
-  --color-primary: #0a2342;
-  --color-secondary: #2d6a4f;
-  --color-accent: #f97316;
+  --color-primary: #D4541A;    /* Orange */
+  --color-navy: #1B2A4A;       /* Deep Navy */
+  --color-teal: #0D7377;       /* Adventure Teal */
+  --color-gold: #C9860A;       /* Summit Gold */
+  --color-charcoal: #2C2C2C;   /* Charcoal (text) */
+  --color-gray: #555555;       /* Gray */
+  --color-light-orange: #FBE8DF; /* Light Orange */
+  --color-light-navy: #E8EDF5;   /* Light Navy */
 
   /* Font mapping */
-  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-dancing), cursive;
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #FFFFFF;
+  --foreground: #2C2C2C;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
+    --background: #FFFFFF;
+    --foreground: #2C2C2C;
   }
 }
 

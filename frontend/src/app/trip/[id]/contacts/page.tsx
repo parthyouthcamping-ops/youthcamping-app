@@ -10,63 +10,66 @@ export default function TripContacts({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     const load = async () => {
-      const headers = { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` };
-      const [conRes, tripRes] = await Promise.all([
-         fetch(`/api/traveler/trip/${tripId}/contacts`, { headers }),
-         fetch(`/api/traveler/trip/${tripId}`, { headers })
-      ]);
-      if(conRes.ok) setContacts(await conRes.json());
-      if(tripRes.ok) setTrip(await tripRes.json());
+      try {
+        const [conRes, tripRes] = await Promise.all([
+           fetch(`/api/traveler/trip/${tripId}/contacts`, { credentials: "include" }),
+           fetch(`/api/traveler/trip/${tripId}`, { credentials: "include" })
+        ]);
+        if(conRes.ok) setContacts(await conRes.json());
+        if(tripRes.ok) setTrip(await tripRes.json());
+      } catch (error) {
+        console.error("Contacts load failed:", error);
+      }
     };
     load();
   }, [tripId]);
 
-  if(!contacts.length || !trip) return <div className="text-center py-20 text-gray-500">Loading contacts...</div>;
+  if(!contacts.length || !trip) return <div className="text-center py-20 text-gray font-body italic">Syncing field team...</div>;
 
   const getIcon = (role: string) => {
      switch(role) {
-        case "DRIVER": return <Car className="w-6 h-6 text-blue-500" />;
+        case "DRIVER": return <Car className="w-6 h-6 text-navy" />;
         case "MEDIC": return <Stethoscope className="w-6 h-6 text-red-500" />;
-        case "GUIDE": return <ShieldCheck className="w-6 h-6 text-green-500" />;
-        default: return <UserCircle className="w-6 h-6 text-gray-500" />;
+        case "GUIDE": return <ShieldCheck className="w-6 h-6 text-teal" />;
+        default: return <UserCircle className="w-6 h-6 text-gray" />;
      }
   };
 
   return (
-    <div className="space-y-4">
-       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+    <div className="space-y-4 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto pt-6 pb-20 font-body">
+       <div className="bg-navy rounded-3xl p-8 shadow-xl shadow-navy/20 flex items-center justify-between font-body">
           <div>
-             <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Vehicle Details</p>
-             <p className="font-black text-[#0f2d54] text-xl tracking-widest">{trip.vehicleNumber}</p>
-             <p className="text-sm text-gray-600 font-medium">{trip.vehicleType}</p>
+             <p className="text-[10px] text-white/50 font-black uppercase tracking-widest mb-2 font-heading">Vehicle Details</p>
+             <p className="font-black text-white text-2xl tracking-[0.15em] font-heading">{trip.vehicleNumber}</p>
+             <p className="text-xs text-primary font-black uppercase tracking-widest mt-1">{trip.vehicleType}</p>
           </div>
-          <div className="w-14 h-14 bg-gray-50 rounded-full flex justify-center items-center border-2 border-dashed border-gray-200">
-             <Car className="w-6 h-6 text-gray-400" />
+          <div className="w-16 h-16 bg-white/5 rounded-2xl flex justify-center items-center border border-white/10 shadow-inner">
+             <Car className="w-8 h-8 text-white/80" />
           </div>
        </div>
 
-       {contacts.map(c => (
-          <div key={c.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-             <div className="flex items-center gap-4 mb-4">
-                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                   {getIcon(c.role)}
-                </div>
-                <div>
-                   <h3 className="font-bold text-[#0f172a] text-lg leading-tight">{c.user.name}</h3>
-                   <p className="text-xs text-[#64748b] font-bold tracking-widest uppercase">{c.role}</p>
-                </div>
-             </div>
-
-             <div className="grid grid-cols-2 gap-3 mt-2">
-                <a href={`tel:${c.user.phone}`} className="flex items-center justify-center gap-2 bg-[#0f2d54] hover:bg-[#0f2d54]/90 text-white py-3 rounded-xl font-bold transition text-sm">
-                   <Phone className="w-4 h-4" /> Call
-                </a>
-                <a href={`https://wa.me/${c.user.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold transition text-sm">
-                   <MessageCircle className="w-4 h-4" /> WhatsApp
-                </a>
-             </div>
-          </div>
-       ))}
+        {contacts.map(c => (
+           <div key={c.id} className="bg-white p-7 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
+              <div className="flex items-center gap-5 mb-6">
+                 <div className="bg-navy/5 p-4 rounded-2xl border border-navy/5 group-hover:scale-110 transition-transform">
+                    {getIcon(c.role)}
+                 </div>
+                 <div>
+                    <h3 className="font-black text-navy text-xl leading-tight font-heading uppercase tracking-tight">{c.user.name}</h3>
+                    <p className="text-[10px] text-teal font-black tracking-[0.2em] uppercase font-heading">{c.role}</p>
+                 </div>
+              </div>
+ 
+              <div className="grid grid-cols-2 gap-4">
+                 <a href={`tel:${c.user.phone}`} className="flex items-center justify-center gap-3 bg-navy hover:bg-navy/90 text-white py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-navy/10 text-[10px] font-heading">
+                    <Phone className="w-4 h-4 text-primary" /> Call Team
+                 </a>
+                 <a href={`https://wa.me/${c.user.phone?.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-teal hover:bg-teal/90 text-white py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-teal/10 text-[10px] font-heading">
+                    <MessageCircle className="w-4 h-4 text-white" /> Message
+                 </a>
+              </div>
+           </div>
+        ))}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function AdminTrips() {
 
   const loadTrips = async () => {
     const res = await fetch("/api/admin/trips", {
-      headers: { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      credentials: "include"
     });
     if(res.ok) setTrips(await res.json());
   };
@@ -23,35 +23,35 @@ export default function AdminTrips() {
     if(!confirm("Delete this trip permanently?")) return;
     await fetch(`/api/admin/trips/${id}`, {
       method: "DELETE",
-      headers: { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` }
+      credentials: "include"
     });
     loadTrips();
   };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-       <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div>
-            <h1 className="text-3xl font-black text-[#0f2d54]">Manage Trips</h1>
-            <p className="text-[#64748b]">View, edit, and organize all active itineraries.</p>
-          </div>
-          <Link href="/admin/trips/new" className="bg-[#f97316] hover:bg-[#ea580c] text-white px-5 py-3 rounded-xl font-bold flex items-center gap-2 transition">
-             <PlusCircle className="w-5 h-5" /> Create Trip
-          </Link>
-       </div>
+     <div className="flex justify-between items-center bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+        <div>
+          <h1 className="text-3xl font-black text-navy font-heading uppercase tracking-tight">Manage Trips</h1>
+          <p className="text-gray mt-1 font-body">View, edit, and organize all active itineraries.</p>
+        </div>
+        <Link href="/admin/trips/new" className="bg-primary hover:bg-primary/90 text-white px-6 py-4 rounded-xl font-bold flex items-center gap-2 transition shadow-lg shadow-primary/20 font-heading">
+           <PlusCircle className="w-5 h-5" /> Create Trip
+        </Link>
+     </div>
 
-       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-             <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-gray-50 text-gray-500 font-semibold uppercase tracking-wider text-xs">
-                   <tr>
-                      <th className="px-6 py-4">Title</th>
-                      <th className="px-6 py-4">Destination</th>
-                      <th className="px-6 py-4">Departure</th>
-                      <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4 text-right">Actions</th>
-                   </tr>
-                </thead>
+     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden font-body">
+        <div className="overflow-x-auto">
+           <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-navy text-white font-semibold uppercase tracking-wider text-[10px] font-heading">
+                 <tr>
+                    <th className="px-6 py-5">Title</th>
+                    <th className="px-6 py-5">Destination</th>
+                    <th className="px-6 py-5">Departure</th>
+                    <th className="px-6 py-5">Status</th>
+                    <th className="px-6 py-5 text-right">Actions</th>
+                 </tr>
+              </thead>
                 <tbody className="divide-y divide-gray-50">
                    {trips.map(t => (
                       <tr key={t.id} className="hover:bg-gray-50 transition">

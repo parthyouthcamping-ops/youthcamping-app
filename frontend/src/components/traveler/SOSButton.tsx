@@ -13,9 +13,7 @@ export default function SOSButton({ tripId }: { tripId: string }) {
      try {
        const res = await fetch(`/api/traveler/trip/${tripId}/sos`, {
          method: "POST",
-         headers: {
-           "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}`
-         }
+         credentials: "include"
        });
        if(res.ok) {
          setStatus("sent");

@@ -1,0 +1,9 @@
+{
+  "appId": "com.youthcamping.app",
+  "appName": "YouthCamping",
+  "webDir": "out",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

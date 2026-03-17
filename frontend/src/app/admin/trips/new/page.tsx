@@ -29,9 +29,9 @@ export default function NewTrip() {
        const res = await fetch("/api/admin/trips", {
          method: "POST",
          headers: {
-           "Content-Type": "application/json",
-           "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}`
+           "Content-Type": "application/json"
          },
+         credentials: "include",
          body: JSON.stringify({
             ...form,
             groupSize: Number(form.groupSize),
@@ -52,16 +52,16 @@ export default function NewTrip() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-20">
+    <div className="max-w-4xl mx-auto space-y-8 pb-20 font-montserrat">
        <div>
-          <h1 className="text-3xl font-black text-[#0f2d54]">Create New Trip</h1>
-          <p className="text-[#64748b]">Configure an upcoming adventure itinerary.</p>
+          <h1 className="text-4xl font-black text-navy uppercase tracking-tight font-heading">Create New Trip</h1>
+          <p className="text-gray mt-1 font-body">Configure an upcoming adventure itinerary.</p>
        </div>
 
-       <form onSubmit={submit} className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-8">
+       <form onSubmit={submit} className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100 space-y-10 font-body">
           
-          <div className="space-y-4">
-             <h2 className="text-lg font-bold text-[#f97316] border-b pb-2 uppercase tracking-widest text-xs">Core Information</h2>
+          <div className="space-y-6">
+             <h2 className="text-xs font-black text-primary border-b border-primary/10 pb-3 uppercase tracking-widest font-heading">Core Information</h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-semibold">
                 <input required placeholder="Trip Title" className="border rounded-xl p-3 bg-gray-50 focus:bg-white" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
                 <input required placeholder="Destination" className="border rounded-xl p-3 bg-gray-50 focus:bg-white" value={form.destination} onChange={e => setForm({...form, destination: e.target.value})} />
@@ -78,10 +78,10 @@ export default function NewTrip() {
              </div>
           </div>
 
-          <div className="space-y-4">
-             <h2 className="text-lg font-bold text-[#f97316] border-b pb-2 uppercase tracking-widest text-xs flex justify-between">
+          <div className="space-y-6">
+             <h2 className="text-xs font-black text-primary border-b border-primary/10 pb-3 uppercase tracking-widest font-heading flex justify-between items-center">
                 Itinerary
-                <button type="button" onClick={() => setItinerary([...itinerary, { dayNumber: itinerary.length+1, date: "", title: "", activities: "" }])} className="text-blue-500 hover:text-blue-700 text-sm font-bold lowercase">+ Add Day</button>
+                <button type="button" onClick={() => setItinerary([...itinerary, { dayNumber: itinerary.length+1, date: "", title: "", activities: "" }])} className="text-teal hover:text-teal/80 text-[10px] font-black uppercase tracking-widest">+ Add Day</button>
              </h2>
              {itinerary.map((day, ix) => (
                 <div key={ix} className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-xl text-sm font-medium border border-gray-100">
@@ -93,10 +93,10 @@ export default function NewTrip() {
              ))}
           </div>
 
-          <div className="space-y-4">
-             <h2 className="text-lg font-bold text-[#f97316] border-b pb-2 uppercase tracking-widest text-xs flex justify-between">
+          <div className="space-y-6">
+             <h2 className="text-xs font-black text-primary border-b border-primary/10 pb-3 uppercase tracking-widest font-heading flex justify-between items-center">
                 Packing List
-                <button type="button" onClick={() => setPacking([...packing, { category: "Clothing", itemName: "", mandatory: true }])} className="text-blue-500 hover:text-blue-700 text-sm font-bold lowercase">+ Add Item</button>
+                <button type="button" onClick={() => setPacking([...packing, { category: "Clothing", itemName: "", mandatory: true }])} className="text-teal hover:text-teal/80 text-[10px] font-black uppercase tracking-widest">+ Add Item</button>
              </h2>
              {packing.map((item, ix) => (
                 <div key={ix} className="flex gap-3 bg-gray-50 p-4 rounded-xl text-sm font-medium border border-gray-100">
@@ -108,8 +108,8 @@ export default function NewTrip() {
              ))}
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full bg-[#0f2d54] hover:bg-[#0b213f] text-white py-6 rounded-2xl text-lg font-bold">
-             {loading ? "Creating..." : "Publish Trip Itinerary"}
+          <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90 text-white py-6 rounded-2xl text-lg font-black uppercase tracking-widest shadow-xl shadow-navy/20 font-heading">
+             {loading ? "Publishing..." : "Launch Trip Itinerary"}
           </Button>
        </form>
     </div>

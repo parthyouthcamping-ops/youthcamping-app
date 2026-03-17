@@ -11,7 +11,7 @@ export default function TripPacking({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     const load = async () => {
       const res = await fetch(`/api/traveler/trip/${tripId}/packing`, {
-         headers: { "Authorization": `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1")}` }
+         credentials: "include"
       });
       if(res.ok) setItems(await res.json());
 
@@ -27,45 +27,47 @@ export default function TripPacking({ params }: { params: Promise<{ id: string }
     localStorage.setItem(`packing_${tripId}`, JSON.stringify(updated));
   };
 
-  if(!items.length) return <div className="text-center py-20 text-gray-500">Loading packing list...</div>;
+  if(!items.length) return <div className="text-center py-20 text-gray font-body italic">Syncing packing list...</div>;
 
   const categories = Array.from(new Set(items.map(i => i.category)));
   const progress = Math.round((Object.values(packed).filter(Boolean).length / items.length) * 100) || 0;
 
   return (
-    <div className="space-y-6">
-       <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 sticky top-20 z-30">
-          <div className="flex justify-between text-sm font-bold text-[#0f2d54] mb-2">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto pt-6 pb-20 font-body">
+       <div className="bg-navy p-6 sm:p-8 rounded-3xl shadow-xl shadow-navy/20 sticky top-20 z-30">
+          <div className="flex justify-between text-xs font-black text-white/60 mb-3 font-heading tracking-[0.2em] uppercase">
              <span>Packing Progress</span>
-             <span>{progress}%</span>
+             <span className="text-primary">{progress}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-             <div className="bg-[#2d6a4f] h-3 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+             <div className="bg-primary h-full rounded-full transition-all duration-700 ease-out relative" style={{ width: `${progress}%` }}>
+                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+             </div>
           </div>
        </div>
 
-       {categories.map(cat => (
-          <div key={cat as string} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-             <h3 className="font-bold text-gray-800 p-4 border-b border-gray-50 bg-gray-50/50 uppercase tracking-wider text-xs">{cat}</h3>
-             <ul className="divide-y divide-gray-50">
-               {items.filter(i => i.category === cat).map(item => (
-                  <li 
-                     key={item.id} 
-                     onClick={() => toggle(item.id)}
-                     className="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition"
-                  >
-                     <button className={`${packed[item.id] ? "text-[#2d6a4f]" : "text-gray-300 hover:text-gray-400"}`}>
-                        {packed[item.id] ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
-                     </button>
-                     <span className={`${packed[item.id] ? "text-gray-400 line-through" : "text-gray-700"} text-sm font-medium`}>
-                        {item.itemName}
-                        {item.mandatory && !packed[item.id] && <span className="text-red-500 ml-1 text-xs">*</span>}
-                     </span>
-                  </li>
-               ))}
-             </ul>
-          </div>
-       ))}
+        {categories.map(cat => (
+           <div key={cat as string} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md group">
+              <h3 className="font-black text-navy p-5 border-b border-gray-50 bg-gray-50/30 uppercase tracking-[0.15em] text-[10px] font-heading">{cat}</h3>
+              <ul className="divide-y divide-gray-50">
+                {items.filter(i => i.category === cat).map(item => (
+                   <li 
+                      key={item.id} 
+                      onClick={() => toggle(item.id)}
+                      className="flex items-center gap-4 p-5 hover:bg-gray-50/50 cursor-pointer transition select-none"
+                   >
+                       <div className={`${packed[item.id] ? "text-teal" : "text-gray-300 group-hover:text-gray-400"} transition-colors`}>
+                          {packed[item.id] ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                       </div>
+                       <span className={`${packed[item.id] ? "text-gray/50 line-through" : "text-navy"} text-sm sm:text-base font-semibold transition-all`}>
+                         {item.itemName}
+                         {item.mandatory && !packed[item.id] && <span className="text-red-500 ml-1.5 text-xs font-black uppercase tracking-tighter">* Required</span>}
+                      </span>
+                   </li>
+                ))}
+              </ul>
+           </div>
+        ))}
     </div>
   );
 }
